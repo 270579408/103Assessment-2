@@ -8,8 +8,7 @@ using namespace std;
 struct User {
     string username;
     string password;
-    string role; // "user" or "admin"
-};
+    string role; // "user" only
 
 vector<User> loadUsers() {
     vector<User> users;
@@ -51,14 +50,8 @@ void registerUser() {
 
     cout << "Please enter the password: ";
     cin >> password;
-    cout << "Please enter the role(user/admin)：";
-    cin >> role;
-
-    if (role != "user" && role != "admin") {
-        cout << "Invalid role!O mly can be user or admin.\n";
-        return;
-    }
-    saveUser({ username, password, role });
+    
+    saveUser({ username, password, "User"});
     cout << "Resigestration successful!\n";
 }
 
@@ -71,23 +64,20 @@ void loginUser() {
     cout << "Please enter the password: ";
     cin >> password;
 
+    if (username == "admin" && password == "admin123") {
+        cout << "Welcome admin: admin!" << username << endl;
+        // Admin page
+        cout << "Admin Function\n";
+    }
     for (const auto& user : users) {
         if (user.username == username && user.password == password) {
             cout << "Login successful!\n";
-
-            if (user.role == "admin") {
-                cout << "Welcome admin!" << username << endl;
-                // Admin page
-                cout << "Admin Function\n";
-            }
-            else {
-                cout << "Welcome user!" << username << endl;
+            cout << "Welcome user!" << username << endl;
                 // User page
                 cout << "User Function\n";
             }
             return;
         }
-    }
     cout << "Username or password incorrect.\n";
 }
 
