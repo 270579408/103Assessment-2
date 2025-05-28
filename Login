@@ -1,0 +1,116 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <sstream>
+using namespace std;
+
+struct User {
+    string username;
+    string password;
+    string role; // "user" or "admin"
+};
+
+vector<User> loadUsers() {
+    vector<User> users;
+    ifstream file("users.txt");
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string username, password, role;
+        getline(ss, username, ',');
+        getline(ss, password, ',');
+        getline(ss, role, ',');
+        users.push_back({ username, password, role });
+    }
+    return users;
+}
+
+void saveUser(const User& user) {
+    ofstream file("users.txt", ios::app);
+    file << user.username << "," << user.password << "," << user.role << endl;
+}
+
+bool userExists(const vector<User>& users, const string& username) {
+    for (const auto& user : users) {
+        if (user.username == username) return true;
+    }
+    return false;
+}
+
+void registerUser() {
+    string username, password, role;
+    vector<User> users = loadUsers();
+    cout << "Pleaese enter username: ";
+    cin >> username;
+
+    if (userExists(users, username)) {
+        cout << "This username already exits. Please enter another username.\n";
+        return;
+    }
+
+    cout << "Please enter the password: ";
+    cin >> password;
+    cout << "Please enter the role(user/admin)：";
+    cin >> role;
+
+    if (role != "user" && role != "admin") {
+        cout << "Invalid role!O mly can be user or admin.\n";
+        return;
+    }
+    saveUser({ username, password, role });
+    cout << "Resigestration successful!\n";
+}
+
+void loginUser() {
+
+    string username, password;
+    vector<User> users = loadUsers();
+    cout << "Pleaese enter username: ";
+    cin >> username;
+    cout << "Please enter the password: ";
+    cin >> password;
+
+    for (const auto& user : users) {
+        if (user.username == username && user.password == password) {
+            cout << "Login successful!\n";
+
+            if (user.role == "admin") {
+                cout << "Welcome admin!" << username << endl;
+                // Admin page
+                cout << "Admin Function\n";
+            }
+            else {
+                cout << "Welcome user!" << username << endl;
+                // User page
+                cout << "User Function\n";
+            }
+            return;
+        }
+    }
+    cout << "Username or password incorrect.\n";
+}
+
+int main() {
+    int choice;
+    while (true) {
+        cout << "\n********************Welcome to Aotearoa Treasures inventory management system********************\n";
+        cout << "1. Register\n2. Login\n0. Exit\nPlease enter your choice：";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            registerUser();
+            break;
+        case 2:
+            loginUser();
+            break;
+        case 0:
+            cout << "Baybe！\n";
+            return 0;
+        default:
+            cout << "Invalid option.\n";
+        }
+    }
+    return 0;
+}
