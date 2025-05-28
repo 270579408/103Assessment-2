@@ -74,13 +74,13 @@ void loginUser() {
         if (user.username == username && user.password == password) {
             cout << "Login successful!\n";
             cout << "Welcome user!" << username << endl;
-                // User page
+            // User page
             cout << "User Function\n";
-  return;
-            }
-     }     
-    cout << "Username or password incorrect.\n";
-}
+            return;
+        }
+    }
+            cout << "Username or password incorrect.\n";       
+    }
 
 int main() {
     int choice;
