@@ -78,8 +78,8 @@ void loginUser() {
                 cout << "User Function\n";
             }
             return;
-        }
     cout << "Username or password incorrect.\n";
+}
 }
 
 int main() {
