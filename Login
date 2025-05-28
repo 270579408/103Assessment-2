@@ -75,11 +75,11 @@ void loginUser() {
             cout << "Login successful!\n";
             cout << "Welcome user!" << username << endl;
                 // User page
-                cout << "User Function\n";
+            cout << "User Function\n";
+  return;
             }
-            return;
+     }     
     cout << "Username or password incorrect.\n";
-}
 }
 
 int main() {
