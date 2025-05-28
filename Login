@@ -9,6 +9,7 @@ struct User {
     string username;
     string password;
     string role; // "user" only
+};
 
 vector<User> loadUsers() {
     vector<User> users;
