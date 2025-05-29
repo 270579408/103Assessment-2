@@ -50,13 +50,13 @@ bool userExists(const vector<User>& users, const string& username) {
 void registerUser() {
     string username, password;
     vector<User> users = loadUsers();
-    cout << "Please enter username: ";
+    cout << "Please enter username:\n";
     cin >> username;
     if (userExists(users, username)) {
         cout << "This username already exists. Please enter another username.\n";
         return;
     }
-    cout << "Please enter the password: ";
+    cout << "Please enter the password:\n";
     cin >> password;
     
     if (password.length() < 4) {
@@ -329,9 +329,9 @@ void loginUser() {
     string username, password;
     vector<User> users = loadUsers();
     
-    cout << "Please enter username: ";
+    cout << "Please enter username:\n";
     cin >> username;
-    cout << "Please enter the password: ";
+    cout << "Please enter the password:\n";
     cin >> password;
     
     currentUsername = username;
@@ -371,7 +371,7 @@ int main() {
     int choice;
     while (true) {
         cout << "\n*******Welcome to Aotearoa Treasures*******\n";
-        cout << "1. Register\n2. Login\n0. Exit\nPlease enter your choice: ";
+        cout << "1. Register\n2. Login\n0. Exit\nPlease enter your choice:\n";
         cin >> choice;
         switch (choice) {
         case 1:
