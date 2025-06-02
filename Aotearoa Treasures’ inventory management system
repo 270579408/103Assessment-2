@@ -235,7 +235,63 @@ void deleteStaff() {
     cout << "Delete staff - coming soon!\n";
     // TODO: Implement deleting staff members
 }
+// === STOCK MANAGEMENT SUBMENU ===
+void stockManagementMenu() {
+   int choice;
+   do {
+       cout << "\n";
+       printSeparator();
+       cout << "=== Stock Management ===\n";
+       cout << "1. View product stock and low stock alerts\n";
+       cout << "2. Add product stock to branch\n";
+       cout << "3. Update product stock\n";
+       cout << "4. Delete product stock\n";
+       cout << "0. Back to Admin Menu\n";
+       printSeparator();
+       cout << "Enter choice: ";
+       while (!(cin >> choice)) {
+           cout << "Invalid input. Please enter a number: ";
+           clearInput();
+       }
+       switch (choice) {
+           case 1: viewStockLevels(); break;
+           case 2: addStockItem(); break;
+           case 3: updateStockItem(); break;
+           case 4: deleteStockItem(); break;
+           case 0: cout << "Returning to Admin Menu...\n"; break;
+           default: cout << "Invalid choice. Please try again.\n"; break;
+       }
+   } while (choice != 0);
+}
 
+// === STAFF MANAGEMENT SUBMENU ===
+void staffManagementMenu() {
+   int choice;
+   do {
+       cout << "\n";
+       printSeparator();
+       cout << "=== Staff Management ===\n";
+       cout << "1. View staff schedules\n";
+       cout << "2. Add staff\n";
+       cout << "3. Update staff\n";
+       cout << "4. Delete staff\n";
+       cout << "0. Back to Admin Menu\n";
+       printSeparator();
+       cout << "Enter choice: ";
+       while (!(cin >> choice)) {
+           cout << "Invalid input. Please enter a number: ";
+           clearInput();
+       }
+       switch (choice) {
+           case 1: viewStaffSchedules(); break;
+           case 2: addStaff(); break;
+           case 3: updateStaff(); break;
+           case 4: deleteStaff(); break;
+           case 0: cout << "Returning to Admin Menu...\n"; break;
+           default: cout << "Invalid choice. Please try again.\n"; break;
+       }
+   } while (choice != 0);
+}
 // === USER FUNCTIONS (TO BE IMPLEMENTED BY TEAM) ===
 
 void listBranches() {
@@ -264,14 +320,8 @@ void adminMenu() {
         printSeparator();
         cout << "=== Admin Menu (" << currentUsername << ") ===\n";
         cout << "1. Promote user to admin\n";
-        cout << "2. View product stock and low stock alerts\n";
-        cout << "3. Add product stock to branch\n";
-        cout << "4. Update product stock\n";
-        cout << "5. Delete product stock\n";
-        cout << "6. View staff schedules\n";
-        cout << "7. Add staff\n";
-        cout << "8. Update staff\n";
-        cout << "9. Delete staff\n";
+        cout << "2. Staff Management\n";
+        cout << "3. Stock Management\n";
         cout << "0. Logout\n";
         printSeparator();
         cout << "Enter choice: ";
@@ -283,14 +333,8 @@ void adminMenu() {
         
         switch (choice) {
             case 1: promoteUserToAdmin(); break;
-            case 2: viewStockLevels(); break;
-            case 3: addStockItem(); break;
-            case 4: updateStockItem(); break;
-            case 5: deleteStockItem(); break;
-            case 6: viewStaffSchedules(); break;
-            case 7: addStaff(); break;
-            case 8: updateStaff(); break;
-            case 9: deleteStaff(); break;
+            case 2: staffManagementMenu(); break;
+            case 3: stockManagementMenu(); break;
             case 0: cout << "Logging out...\n"; break;
             default: cout << "Invalid choice. Please try again.\n"; break;
         }
