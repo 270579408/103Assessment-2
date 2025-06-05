@@ -76,20 +76,25 @@ struct StockItem {
     StockItem() : name(""), quantity(0), price(0.0) {}
     StockItem(string n, int q, double p) : name(n), quantity(q), price(p) {}
     
-    // TODO: Implement these methods
-    bool isLowStock() { 
-        // TODO: Return true if quantity < 5
-        return false; // Placeholder
+        // Lowstock check
+    bool isLowStock() {
+        return quantity < 5;
     }
-    
+
     bool reduceQuantity(int amount) {
-        // TODO: Reduce quantity by amount if valid
+        if (amount <= 0 || amount > quantity)
         return false; // Placeholder
+        quantity = -amount;
+        return true;
     }
-    
+
     void display(bool showLowStock = false) {
-        // TODO: Display item details with formatting
-        cout << "- " << name << " (Stock display not implemented yet)\n";
+        cout << fixed << setprecision(2);
+        cout << "Name: " << name << " | Quantity: " << quantity << " | Price: $" << price << endl;
+        if (showLowStock && isLowStock()) {
+            cout << " < -- LOW STOCK!";
+        }
+        cout << endl;
     }
 };
 
