@@ -208,13 +208,16 @@ bool getConfirmation(string message) {
 }
 
 void initializeBranches() {
-    // Initialize empty branches - TODO: Add sample data
     branches["Auckland"] = Branch();
     branches["Wellington"] = Branch();
     branches["Christchurch"] = Branch();
-    
-    // TODO: Add sample stock and staff data
-    cout << "Branches initialized (sample data not added yet)\n";
+
+    branches["Auckland"].addStockItem({ "Hand Cream", 10, 19.99 });
+    branches["Auckland"].addStockItem({ "Kiwi Toys", 5, 34.99 });
+    branches["Wellington"].addStockItem({ "Fridge Magnet - cuba street", 12, 6.99 });
+    branches["Christchurch"].addStockItem({ "Wool Scarf - brown", 7, 129.00 });
+
+    cout << "Branches initialized with sample stock.\n";
 }
 
 // === ADMIN FUNCTIONS 
@@ -225,23 +228,77 @@ void promoteUserToAdmin() {
 }
 
 void viewStockLevels() {
-    cout << "Stock level viewing - coming soon!\n";
-    // TODO: Implement stock viewing with low stock alerts
+    cout << "\n=== All Branch Stock Levels ===\n";
+    for (auto& pair : branches) {
+        cout << "\nBranch: " << pair.first << endl;
+        pair.second.displayStock(true); // showLowStock = true
+    }
 }
 
 void addStockItem() {
-    cout << "Add stock item - coming soon!\n";
-    // TODO: Implement adding stock items to branches
+    string branchName, name;
+    int quantity;
+    double price;
+
+    cout << "Enter branch name: ";
+    cin >> branchName;
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found.\n";
+        return;
+    }
+    cout << "Enter product name: ";
+    cin >> name;
+    cout << "Enter quantity: ";
+    cin >> quantity;
+    cout << "Enter price: ";
+    cin >> price;
+
+    StockItem item(name, quantity, price);
+    branches[branchName].addStockItem(item);
 }
 
 void updateStockItem() {
-    cout << "Update stock item - coming soon!\n";
-    // TODO: Implement updating existing stock items
+    string branchName, name;
+    cout << "Enter branch name: ";
+    cin >> branchName;
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found.\n";
+        return;
+    }
+
+    cout << "Enter product name to update: ";
+    cin >> name;
+    StockItem* item = branches[branchName].findStockItem(name);
+    if (!item) {
+        cout << "Item not found.\n";
+        return;
+    }
+
+    cout << "Enter new quantity: ";
+    cin >> item->quantity;
+    cout << "Enter new price: ";
+    cin >> item->price;
+    cout << "Item updated successfully.\n";
 }
 
 void deleteStockItem() {
-    cout << "Delete stock item - coming soon!\n";
-    // TODO: Implement deleting stock items
+    string branchName, name;
+    cout << "Enter branch name: ";
+    cin >> branchName;
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found.\n";
+        return;
+    }
+
+    cout << "Enter product name to delete: ";
+    cin >> name;
+
+    if (branches[branchName].removeStockItem(name)) {
+        cout << "Item removed successfully.\n";
+    }
+    else {
+        cout << "Item not found.\n";
+    }
 }
 
 void viewStaffSchedules() {
