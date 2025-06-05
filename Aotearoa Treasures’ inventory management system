@@ -118,21 +118,38 @@ struct Branch {
     
     Branch() {}
     
-    // TODO: Implement these methods
-    void addStockItem(StockItem item) {
-        // TODO: Add stock item to branch
-        cout << "Add stock item - not implemented yet\n";
-    }
-    
-    StockItem* findStockItem(string name) {
-        // TODO: Find stock item by name (case-insensitive)
-        return nullptr; // Placeholder
-    }
-    
-    bool removeStockItem(string name) {
-        // TODO: Remove stock item by name
-        return false; // Placeholder
-    }
+    // Add stock item
+ void addStockItem(StockItem item) {
+     for (auto& s : stock) {
+         if (toLowerCase(s.name) == toLowerCase(item.name)) {
+             s.quantity += item.quantity;
+             cout << "Stock updated: " << item.name << " now has quantity " << s.quantity << endl;
+             return;
+         }
+     }
+     stock.push_back(item);
+     cout << "Stock item added: " << item.name << endl;
+ }
+
+ // Find stock item
+ StockItem* findStockItem(string name) {
+     for (auto& s : stock) {
+         if (toLowerCase(s.name) == toLowerCase(name)) return &s;
+     }
+     return nullptr;
+ }
+
+ // Remove stock item
+ bool removeStockItem(string name) {
+     auto it = remove_if(stock.begin(), stock.end(), [&](StockItem& s) {
+         return toLowerCase(s.name) == toLowerCase(name);
+         });
+     if (it != stock.end()) {
+         stock.erase(it, stock.end());
+         return true;
+     }
+     return false;
+ }
     
     void addStaff(Staff member) {
         // TODO: Add staff member
@@ -149,10 +166,16 @@ struct Branch {
         return false; // Placeholder
     }
     
-    void displayStock(bool showLowStock = false) {
-        // TODO: Display all stock items
-        cout << "Stock display - not implemented yet\n";
+    // display stock
+void displayStock(bool showLowStock = false) {
+    if (stock.empty()) {
+        cout << "No stock items in this branch.\n";
+        return;
     }
+    for (auto& item : stock) {
+        item.display(showLowStock);
+    }
+}
     
     void displayStaff() {
         // TODO: Display all staff
