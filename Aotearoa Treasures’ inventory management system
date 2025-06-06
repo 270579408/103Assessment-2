@@ -58,13 +58,13 @@ void registerUser() {
     }
     cout << "Please enter the password:\n";
     cin >> password;
-    
+
     if (password.length() < 4) {
         cout << "Password must be at least 4 characters long.\n";
         return;
     }
-    
-    saveUser({ username, password, "User"});
+
+    saveUser({ username, password, "User" });
     cout << "Registration successful!\n";
 }
 
@@ -72,19 +72,19 @@ struct StockItem {
     string name;
     int quantity;
     double price;
-    
+
     StockItem() : name(""), quantity(0), price(0.0) {}
     StockItem(string n, int q, double p) : name(n), quantity(q), price(p) {}
-    
-        // Lowstock check
+
+    // Lowstock check
     bool isLowStock() {
         return quantity < 5;
     }
 
     bool reduceQuantity(int amount) {
         if (amount <= 0 || amount > quantity)
-        return false; // Placeholder
-        quantity = -amount;
+            return false; // Placeholder
+        quantity -= amount;
         return true;
     }
 
@@ -102,10 +102,10 @@ struct Staff {
     string name;
     string role;
     string schedule;
-    
+
     Staff() : name(""), role(""), schedule("") {}
     Staff(string n, string r, string s) : name(n), role(r), schedule(s) {}
-    
+
     void display() {
         // TODO: Display staff details
         cout << "- " << name << " (Staff display not implemented yet)\n";
@@ -115,68 +115,72 @@ struct Staff {
 struct Branch {
     vector<StockItem> stock;
     vector<Staff> staff;
-    
+    string toLowerCase(string str) {
+        transform(str.begin(), str.end(), str.begin(), ::tolower);
+        return str;
+    }
+
     Branch() {}
-    
+
     // Add stock item
- void addStockItem(StockItem item) {
-     for (auto& s : stock) {
-         if (toLowerCase(s.name) == toLowerCase(item.name)) {
-             s.quantity += item.quantity;
-             cout << "Stock updated: " << item.name << " now has quantity " << s.quantity << endl;
-             return;
-         }
-     }
-     stock.push_back(item);
-     cout << "Stock item added: " << item.name << endl;
- }
+    void addStockItem(StockItem item) {
+        for (auto& s : stock) {
+            if (toLowerCase(s.name) == toLowerCase(item.name)) {
+                s.quantity += item.quantity;
+                cout << "Stock updated: " << item.name << " now has quantity " << s.quantity << endl;
+                return;
+            }
+        }
+        stock.push_back(item);
+        cout << "Stock item added: " << item.name << endl;
+    }
 
- // Find stock item
- StockItem* findStockItem(string name) {
-     for (auto& s : stock) {
-         if (toLowerCase(s.name) == toLowerCase(name)) return &s;
-     }
-     return nullptr;
- }
+    // Find stock item
+    StockItem* findStockItem(string name) {
+        for (auto& s : stock) {
+            if (toLowerCase(s.name) == toLowerCase(name)) return &s;
+        }
+        return nullptr;
+    }
 
- // Remove stock item
- bool removeStockItem(string name) {
-     auto it = remove_if(stock.begin(), stock.end(), [&](StockItem& s) {
-         return toLowerCase(s.name) == toLowerCase(name);
-         });
-     if (it != stock.end()) {
-         stock.erase(it, stock.end());
-         return true;
-     }
-     return false;
- }
-    
+    // Remove stock item
+    bool removeStockItem(string name) {
+        auto it = remove_if(stock.begin(), stock.end(), [&](StockItem& s) {
+            return toLowerCase(s.name) == toLowerCase(name);
+            });
+        if (it != stock.end()) {
+            stock.erase(it, stock.end());
+            return true;
+        }
+        return false;
+    }
+
     void addStaff(Staff member) {
         // TODO: Add staff member
         cout << "Add staff - not implemented yet\n";
     }
-    
+
     Staff* findStaff(string name) {
         // TODO: Find staff by name
         return nullptr; // Placeholder
     }
-    
+
     bool removeStaff(string name) {
         // TODO: Remove staff by name
         return false; // Placeholder
     }
-    
+
     // display stock
-void displayStock(bool showLowStock = false) {
-    if (stock.empty()) {
-        cout << "No stock items in this branch.\n";
-        return;
+    void displayStock(bool showLowStock = false) {
+        if (stock.empty()) {
+            cout << "No stock items in this branch.\n";
+            return;
+        }
+        for (auto& item : stock) {
+            item.display(showLowStock);
+        }
     }
-    for (auto& item : stock) {
-        item.display(showLowStock);
-    }
-}
-    
+
     void displayStaff() {
         // TODO: Display all staff
         cout << "Staff display - not implemented yet\n";
@@ -189,11 +193,6 @@ unordered_map<string, Branch> branches;
 void clearInput() {
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-}
-
-string toLowerCase(string str) {
-    transform(str.begin(), str.end(), str.begin(), ::tolower);
-    return str;
 }
 
 void printSeparator(char c = '=', int length = 50) {
@@ -247,7 +246,8 @@ void addStockItem() {
         return;
     }
     cout << "Enter product name: ";
-    cin >> name;
+    cin.ignore();
+    getline(cin, name);
     cout << "Enter quantity: ";
     cin >> quantity;
     cout << "Enter price: ";
@@ -267,7 +267,8 @@ void updateStockItem() {
     }
 
     cout << "Enter product name to update: ";
-    cin >> name;
+    cin.ignore();
+    getline(cin, name);
     StockItem* item = branches[branchName].findStockItem(name);
     if (!item) {
         cout << "Item not found.\n";
@@ -291,7 +292,8 @@ void deleteStockItem() {
     }
 
     cout << "Enter product name to delete: ";
-    cin >> name;
+    cin.ignore();
+    getline(cin, name);
 
     if (branches[branchName].removeStockItem(name)) {
         cout << "Item removed successfully.\n";
@@ -322,60 +324,60 @@ void deleteStaff() {
 }
 // === STOCK MANAGEMENT SUBMENU ===
 void stockManagementMenu() {
-   int choice;
-   do {
-       cout << "\n";
-       printSeparator();
-       cout << "=== Stock Management ===\n";
-       cout << "1. View product stock and low stock alerts\n";
-       cout << "2. Add product stock to branch\n";
-       cout << "3. Update product stock\n";
-       cout << "4. Delete product stock\n";
-       cout << "0. Back to Admin Menu\n";
-       printSeparator();
-       cout << "Enter choice: ";
-       while (!(cin >> choice)) {
-           cout << "Invalid input. Please enter a number: ";
-           clearInput();
-       }
-       switch (choice) {
-           case 1: viewStockLevels(); break;
-           case 2: addStockItem(); break;
-           case 3: updateStockItem(); break;
-           case 4: deleteStockItem(); break;
-           case 0: cout << "Returning to Admin Menu...\n"; break;
-           default: cout << "Invalid choice. Please try again.\n"; break;
-       }
-   } while (choice != 0);
+    int choice;
+    do {
+        cout << "\n";
+        printSeparator();
+        cout << "=== Stock Management ===\n";
+        cout << "1. View product stock and low stock alerts\n";
+        cout << "2. Add product stock to branch\n";
+        cout << "3. Update product stock\n";
+        cout << "4. Delete product stock\n";
+        cout << "0. Back to Admin Menu\n";
+        printSeparator();
+        cout << "Enter choice: ";
+        while (!(cin >> choice)) {
+            cout << "Invalid input. Please enter a number: ";
+            clearInput();
+        }
+        switch (choice) {
+        case 1: viewStockLevels(); break;
+        case 2: addStockItem(); break;
+        case 3: updateStockItem(); break;
+        case 4: deleteStockItem(); break;
+        case 0: cout << "Returning to Admin Menu...\n"; break;
+        default: cout << "Invalid choice. Please try again.\n"; break;
+        }
+    } while (choice != 0);
 }
 
 // === STAFF MANAGEMENT SUBMENU ===
 void staffManagementMenu() {
-   int choice;
-   do {
-       cout << "\n";
-       printSeparator();
-       cout << "=== Staff Management ===\n";
-       cout << "1. View staff schedules\n";
-       cout << "2. Add staff\n";
-       cout << "3. Update staff\n";
-       cout << "4. Delete staff\n";
-       cout << "0. Back to Admin Menu\n";
-       printSeparator();
-       cout << "Enter choice: ";
-       while (!(cin >> choice)) {
-           cout << "Invalid input. Please enter a number: ";
-           clearInput();
-       }
-       switch (choice) {
-           case 1: viewStaffSchedules(); break;
-           case 2: addStaff(); break;
-           case 3: updateStaff(); break;
-           case 4: deleteStaff(); break;
-           case 0: cout << "Returning to Admin Menu...\n"; break;
-           default: cout << "Invalid choice. Please try again.\n"; break;
-       }
-   } while (choice != 0);
+    int choice;
+    do {
+        cout << "\n";
+        printSeparator();
+        cout << "=== Staff Management ===\n";
+        cout << "1. View staff schedules\n";
+        cout << "2. Add staff\n";
+        cout << "3. Update staff\n";
+        cout << "4. Delete staff\n";
+        cout << "0. Back to Admin Menu\n";
+        printSeparator();
+        cout << "Enter choice: ";
+        while (!(cin >> choice)) {
+            cout << "Invalid input. Please enter a number: ";
+            clearInput();
+        }
+        switch (choice) {
+        case 1: viewStaffSchedules(); break;
+        case 2: addStaff(); break;
+        case 3: updateStaff(); break;
+        case 4: deleteStaff(); break;
+        case 0: cout << "Returning to Admin Menu...\n"; break;
+        default: cout << "Invalid choice. Please try again.\n"; break;
+        }
+    } while (choice != 0);
 }
 // === USER FUNCTIONS (TO BE IMPLEMENTED BY TEAM) ===
 
@@ -410,18 +412,18 @@ void adminMenu() {
         cout << "0. Logout\n";
         printSeparator();
         cout << "Enter choice: ";
-        
+
         while (!(cin >> choice)) {
             cout << "Invalid input. Please enter a number: ";
             clearInput();
         }
-        
+
         switch (choice) {
-            case 1: promoteUserToAdmin(); break;
-            case 2: staffManagementMenu(); break;
-            case 3: stockManagementMenu(); break;
-            case 0: cout << "Logging out...\n"; break;
-            default: cout << "Invalid choice. Please try again.\n"; break;
+        case 1: promoteUserToAdmin(); break;
+        case 2: staffManagementMenu(); break;
+        case 3: stockManagementMenu(); break;
+        case 0: cout << "Logging out...\n"; break;
+        default: cout << "Invalid choice. Please try again.\n"; break;
         }
     } while (choice != 0);
 }
@@ -438,18 +440,18 @@ void userMenu() {
         cout << "0. Logout\n";
         printSeparator();
         cout << "Enter choice: ";
-        
+
         while (!(cin >> choice)) {
             cout << "Invalid input. Please enter a number: ";
             clearInput();
         }
-        
+
         switch (choice) {
-            case 1: listBranches(); break;
-            case 2: browseBranchStock(); break;
-            case 3: buyFromBranch(); break;
-            case 0: cout << "Logging out...\n"; break;
-            default: cout << "Invalid choice. Please try again.\n"; break;
+        case 1: listBranches(); break;
+        case 2: browseBranchStock(); break;
+        case 3: buyFromBranch(); break;
+        case 0: cout << "Logging out...\n"; break;
+        default: cout << "Invalid choice. Please try again.\n"; break;
         }
     } while (choice != 0);
 }
@@ -461,38 +463,39 @@ void loginUser() {
     const int maxAttempts = 3;
 
     while (attempts < maxAttempts) {
-    cout << "Please enter username:\n";
-    cin >> username;
-    cout << "Please enter the password:\n";
-    cin >> password;
-    
-    currentUsername = username;
-    
-    // Check for hardcoded admin first
-    if (username == "admin" && password == "admin123") {
-        cout << "Login successful!\n";
-        cout << "Welcome admin: " << username << endl;
-        currentUserRole = "Admin";
-        adminMenu();
-        return;
-    }
-    
-    // Check registered users
-    for (const auto& user : users) {
-        if (user.username == username && user.password == password) {
+        cout << "Please enter username:\n";
+        cin >> username;
+        cout << "Please enter the password:\n";
+        cin >> password;
+
+        currentUsername = username;
+
+        // Check for hardcoded admin first
+        if (username == "admin" && password == "admin123") {
             cout << "Login successful!\n";
-            currentUserRole = user.role;
-            
-            if (user.role == "Admin") {
-                cout << "Welcome admin: " << username << endl;
-                adminMenu();
-            } else {
-                cout << "Welcome user: " << username << endl;
-                userMenu();
-            }
+            cout << "Welcome admin: " << username << endl;
+            currentUserRole = "Admin";
+            adminMenu();
             return;
         }
-    }
+
+        // Check registered users
+        for (const auto& user : users) {
+            if (user.username == username && user.password == password) {
+                cout << "Login successful!\n";
+                currentUserRole = user.role;
+
+                if (user.role == "Admin") {
+                    cout << "Welcome admin: " << username << endl;
+                    adminMenu();
+                }
+                else {
+                    cout << "Welcome user: " << username << endl;
+                    userMenu();
+                }
+                return;
+            }
+        }
         attempts++;
         if (attempts < maxAttempts) {
             cout << "Username or password incorrect.\n";
@@ -506,7 +509,7 @@ void loginUser() {
 int main() {
     // Initialize branch data
     initializeBranches();
-    
+
     int choice;
     while (true) {
         cout << "\n*******Welcome to Aotearoa Treasures*******\n";
