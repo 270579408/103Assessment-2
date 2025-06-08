@@ -587,7 +587,6 @@ void staffManagementMenu() {
 }
 
 // === USER FUNCTIONS ===
-// === USER FUNCTIONS ===
 void listBranches() {
     cout << "\n=== AOTEAROA TREASURES BRANCHES ===\n";
     for (auto& pair : branches) {
