@@ -19,6 +19,14 @@ struct User {
     string role; // "User" or "Admin"
 };
 
+bool isVaildText(const string& input) {
+    for (char c : input) {
+        if (!isalpha(c) && c != ' ')
+            return false;
+    }
+    return true;
+}
+
 vector<User> loadUsers() {
     vector<User> users;
     ifstream file("users.txt");
@@ -329,9 +337,16 @@ void addStockItem() {
         cout << "Branch not found.\n";
         return;
     }
+
     cout << "Enter product name: ";
     cin.ignore();
     getline(cin, name);
+
+    if (!isVaildText(name)) {
+        cout << "Invaild product name! Only alphabetic characters are allowed.\n";
+        return;
+    }
+
     cout << "Enter quantity: ";
     cin >> quantity;
     cout << "Enter price: ";
@@ -420,9 +435,20 @@ void addStaff() {
         cout << "Staff name cannot be empty.\n";
         return;
     }
-    
+
+     if (!isVaildText(name)) {
+     cout << "Invaild staff name! Only alphabetic characters are allowed.\n";
+     return;
+ }
+
     cout << "Enter staff role: ";
     getline(cin, role);
+
+ if (!isVaildText(role)) {
+     cout << "Invaild staff role! Only alphabetic characters are allowed.\n";
+     return;
+ }
+
     cout << "Enter staff schedule: ";
     getline(cin, schedule);
     
