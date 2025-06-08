@@ -587,77 +587,87 @@ void staffManagementMenu() {
 }
 
 // === USER FUNCTIONS ===
-
+// === USER FUNCTIONS ===
 void listBranches() {
-    cout << "Available branches:\n";
+    cout << "\n=== AOTEAROA TREASURES BRANCHES ===\n";
     for (auto& pair : branches) {
         cout << "- " << pair.first << '\n';
     }
 }
-
 void browseBranchStock() {
     string branchName;
     cout << "Enter branch name to browse: ";
     cin >> branchName;
-    
     if (branches.find(branchName) == branches.end()) {
         cout << "Branch not found. Available branches: Auckland, Wellington, Christchurch\n";
         return;
     }
-    
-    cout << "\n=== Products in " << branchName << " ===\n";
+    cout << "\n=== PRODUCTS AT " << branchName << " ===\n";
     branches[branchName].displayStock(false);
 }
-
 void buyFromBranch() {
-    string branchName, productName;
-    int quantity;
-    
-    cout << "Enter branch name: ";
+    string branchName;
+    cout << "Enter branch name to shop from: ";
     cin >> branchName;
-    
     if (branches.find(branchName) == branches.end()) {
         cout << "Branch not found. Available branches: Auckland, Wellington, Christchurch\n";
         return;
     }
-    
-    cout << "\nAvailable products in " << branchName << ":\n";
-    branches[branchName].displayStock(false);
-    
-    cout << "\nEnter product name to buy: ";
-    cin.ignore();
-    getline(cin, productName);
-    
-    StockItem* item = branches[branchName].findStockItem(productName);
-    if (!item) {
-        cout << "Product not found.\n";
-        return;
-    }
-    
-    cout << "Available quantity: " << item->quantity << endl;
-    cout << "Enter quantity to buy: ";
-    cin >> quantity;
-    
-    if (quantity <= 0) {
-        cout << "Invalid quantity.\n";
-        return;
-    }
-    
-    if (quantity > item->quantity) {
-        cout << "Not enough stock available.\n";
-        return;
-    }
-    
-    double totalCost = quantity * item->price;
-    cout << fixed << setprecision(2);
-    cout << "Total cost: $" << totalCost << endl;
-    
-    if (getConfirmation("Confirm purchase?")) {
-        item->quantity -= quantity;
-        cout << "Purchase successful! Thank you for shopping with Aotearoa Treasures.\n";
-        cout << "Remaining stock: " << item->quantity << endl;
-    } else {
-        cout << "Purchase cancelled.\n";
+    while (true) {
+        cout << "\n=== SHOPPING AT " << branchName << " ===\n";
+        branches[branchName].displayStock(false);
+        string productName;
+        cout << "\nEnter product name to buy (or 'exit' to finish): ";
+        cin.ignore();
+        getline(cin, productName);
+        if (productName == "exit" || productName == "EXIT") {
+            cout << "Thank you for shopping with Aotearoa Treasures!\n";
+            return;
+        }
+        StockItem* item = branches[branchName].findStockItem(productName);
+        if (!item) {
+            cout << "Product not found. Please check the spelling and try again.\n";
+            continue;
+        }
+        if (item->quantity == 0) {
+            cout << "Sorry, this product is out of stock.\n";
+            continue;
+        }
+        int quantity;
+        cout << "Enter quantity to buy (available: " << item->quantity << "): ";
+        while (!(cin >> quantity) || quantity <= 0) {
+            cout << "Invalid quantity. Please enter a positive number: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        if (quantity > item->quantity) {
+            cout << "Sorry, only " << item->quantity << " units available.\n";
+            continue;
+        }
+        double totalCost = quantity * item->price;
+        cout << fixed << setprecision(2)
+            << "\n=== PURCHASE SUMMARY ===\n"
+            << "Product: " << productName << "\n"
+            << "Quantity: " << quantity << "\n"
+            << "Unit Price: $" << item->price << "\n"
+            << "Total Cost: $" << totalCost << "\n";
+        if (getConfirmation("Confirm purchase?")) {
+            item->quantity -= quantity;
+            cout << "\n*** PURCHASE SUCCESSFUL! ***\n";
+            cout << "Thank you for your purchase!\n";
+            cout << "Remaining stock of " << productName
+                << ": " << item->quantity << " units\n";
+            if (getConfirmation("Would you like to continue shopping?")) {
+                continue;
+            }
+            else {
+                cout << "Thank you for shopping with Aotearoa Treasures!\n";
+                return;
+            }
+        }
+        else {
+            cout << "Purchase cancelled.\n";
+        }
     }
 }
 
