@@ -10,7 +10,6 @@
 #include <cmath>
 using namespace std;
 
-
 string currentUsername = "";
 string currentUserRole = "";
 
@@ -38,6 +37,13 @@ vector<User> loadUsers() {
 void saveUser(const User& user) {
     ofstream file("users.txt", ios::app);
     file << user.username << "," << user.password << "," << user.role << endl;
+}
+
+void saveAllUsers(const vector<User>& users) {
+    ofstream file("users.txt");
+    for (const auto& user : users) {
+        file << user.username << "," << user.password << "," << user.role << endl;
+    }
 }
 
 bool userExists(const vector<User>& users, const string& username) {
@@ -83,16 +89,16 @@ struct StockItem {
 
     bool reduceQuantity(int amount) {
         if (amount <= 0 || amount > quantity)
-            return false; // Placeholder
+            return false;
         quantity -= amount;
         return true;
     }
 
     void display(bool showLowStock = false) {
         cout << fixed << setprecision(2);
-        cout << "Name: " << name << " | Quantity: " << quantity << " | Price: $" << price << endl;
+        cout << "Name: " << name << " | Quantity: " << quantity << " | Price: $" << price;
         if (showLowStock && isLowStock()) {
-            cout << " < -- LOW STOCK!";
+            cout << " <-- LOW STOCK!";
         }
         cout << endl;
     }
@@ -107,14 +113,14 @@ struct Staff {
     Staff(string n, string r, string s) : name(n), role(r), schedule(s) {}
 
     void display() {
-        // TODO: Display staff details
-        cout << "- " << name << " (Staff display not implemented yet)\n";
+        cout << "- " << name << " | Role: " << role << " | Schedule: " << schedule << endl;
     }
 };
 
 struct Branch {
     vector<StockItem> stock;
     vector<Staff> staff;
+    
     string toLowerCase(string str) {
         transform(str.begin(), str.end(), str.begin(), ::tolower);
         return str;
@@ -123,19 +129,18 @@ struct Branch {
     Branch() {}
 
     // Add stock item
-    void addStockItem(StockItem item) {
+    void addStockItem(StockItem item, bool silent = false) {
         for (auto& s : stock) {
             if (toLowerCase(s.name) == toLowerCase(item.name)) {
                 s.quantity += item.quantity;
-                cout << "Stock updated: " << item.name << " now has quantity " << s.quantity << endl;
+                if (!silent) cout << "Stock updated: " << item.name << " now has quantity " << s.quantity << endl;
                 return;
             }
         }
         stock.push_back(item);
-        cout << "Stock item added: " << item.name << endl;
+        if (!silent) cout << "Stock item added: " << item.name << endl;
     }
 
-    // Find stock item
     StockItem* findStockItem(string name) {
         for (auto& s : stock) {
             if (toLowerCase(s.name) == toLowerCase(name)) return &s;
@@ -147,7 +152,7 @@ struct Branch {
     bool removeStockItem(string name) {
         auto it = remove_if(stock.begin(), stock.end(), [&](StockItem& s) {
             return toLowerCase(s.name) == toLowerCase(name);
-            });
+        });
         if (it != stock.end()) {
             stock.erase(it, stock.end());
             return true;
@@ -155,39 +160,61 @@ struct Branch {
         return false;
     }
 
-    void addStaff(Staff member) {
-        // TODO: Add staff member
-        cout << "Add staff - not implemented yet\n";
+    void addStaff(Staff member, bool silent = false) {
+        // Check if staff already exists
+        for (const auto& s : staff) {
+            if (toLowerCase(s.name) == toLowerCase(member.name)) {
+                if (!silent) cout << "Staff member " << member.name << " already exists in this branch.\n";
+                return;
+            }
+        }
+        staff.push_back(member);
+        if (!silent) cout << "Staff member " << member.name << " added successfully.\n";
     }
 
     Staff* findStaff(string name) {
-        // TODO: Find staff by name
-        return nullptr; // Placeholder
+        for (auto& s : staff) {
+            if (toLowerCase(s.name) == toLowerCase(name)) {
+                return &s;
+            }
+        }
+        return nullptr;
     }
 
     bool removeStaff(string name) {
-        // TODO: Remove staff by name
-        return false; // Placeholder
+        auto it = remove_if(staff.begin(), staff.end(), [&](Staff& s) {
+            return toLowerCase(s.name) == toLowerCase(name);
+        });
+        if (it != staff.end()) {
+            staff.erase(it, staff.end());
+            return true;
+        }
+        return false;
     }
 
-    // display stock
+    void displayStaff() {
+        if (staff.empty()) {
+            cout << "No staff members in this branch.\n";
+            return;
+        }
+        cout << "Staff Members:\n";
+        for (auto& member : staff) {
+            member.display();
+        }
+    }
+
     void displayStock(bool showLowStock = false) {
         if (stock.empty()) {
             cout << "No stock items in this branch.\n";
             return;
         }
+        cout << "Stock Items:\n";
         for (auto& item : stock) {
             item.display(showLowStock);
         }
     }
-
-    void displayStaff() {
-        // TODO: Display all staff
-        cout << "Staff display - not implemented yet\n";
-    }
 };
 
-// Global data
 unordered_map<string, Branch> branches;
 
 void clearInput() {
@@ -211,19 +238,76 @@ void initializeBranches() {
     branches["Wellington"] = Branch();
     branches["Christchurch"] = Branch();
 
-    branches["Auckland"].addStockItem({ "Hand Cream", 10, 19.99 });
-    branches["Auckland"].addStockItem({ "Kiwi Toys", 5, 34.99 });
-    branches["Wellington"].addStockItem({ "Fridge Magnet - cuba street", 12, 6.99 });
-    branches["Christchurch"].addStockItem({ "Wool Scarf - brown", 7, 129.00 });
+    branches["Auckland"].addStockItem({ "Hand Cream", 10, 19.99 }, true);
+    branches["Auckland"].addStockItem({ "Kiwi Toys", 5, 34.99 }, true);
+    branches["Wellington"].addStockItem({ "Fridge Magnet - cuba street", 12, 6.99 }, true);
+    branches["Christchurch"].addStockItem({ "Wool Scarf - brown", 7, 129.00 }, true);
 
-    cout << "Branches initialized with sample stock.\n";
+    branches["Auckland"].addStaff(Staff("Jett", "Manager", "Mon-Fri 9am-5pm"), true);
+    branches["Auckland"].addStaff(Staff("Phoenix", "Cashier", "Tue-Sat 10am-6pm"), true);
+    
+    branches["Wellington"].addStaff(Staff("Sage", "Sales Assistant", "Mon-Fri 8am-4pm"), true);
+    branches["Wellington"].addStaff(Staff("Sova", "Manager", "Wed-Sun 11am-7pm"), true);
+    
+    branches["Christchurch"].addStaff(Staff("Viper", "Cashier", "Mon-Fri 9am-5pm"), true);
+    branches["Christchurch"].addStaff(Staff("Omen", "Craftsperson", "Tue-Sat 10am-6pm"), true);
 }
 
-// === ADMIN FUNCTIONS 
+// === ADMIN FUNCTIONS ===
 
 void promoteUserToAdmin() {
-    cout << "User promotion - coming soon!\n";
-    // TODO: Implement user promotion functionality
+    vector<User> users = loadUsers();
+    
+    if (users.empty()) {
+        cout << "No registered users found.\n";
+        return;
+    }
+    
+    cout << "\n=== User Promotion to Admin ===\n";
+    cout << "Current registered users:\n";
+    
+    // Display all non-admin users
+    vector<User> regularUsers;
+    for (const auto& user : users) {
+        if (user.role == "User") {
+            regularUsers.push_back(user);
+            cout << "- " << user.username << " (Role: " << user.role << ")\n";
+        }
+    }
+    
+    if (regularUsers.empty()) {
+        cout << "No regular users available for promotion. All users are already admins.\n";
+        return;
+    }
+    
+    string usernameToPromote;
+    cout << "\nEnter username to promote to admin: ";
+    cin >> usernameToPromote;
+    
+    // Find the user and promote them
+    bool userFound = false;
+    for (auto& user : users) {
+        if (user.username == usernameToPromote) {
+            userFound = true;
+            if (user.role == "Admin") {
+                cout << "User " << usernameToPromote << " is already an admin.\n";
+                return;
+            }
+            
+            if (getConfirmation("Are you sure you want to promote " + usernameToPromote + " to admin?")) {
+                user.role = "Admin";
+                saveAllUsers(users);
+                cout << "User " << usernameToPromote << " has been successfully promoted to admin!\n";
+            } else {
+                cout << "Promotion cancelled.\n";
+            }
+            return;
+        }
+    }
+    
+    if (!userFound) {
+        cout << "User " << usernameToPromote << " not found.\n";
+    }
 }
 
 void viewStockLevels() {
@@ -304,24 +388,120 @@ void deleteStockItem() {
 }
 
 void viewStaffSchedules() {
-    cout << "Staff schedule viewing - coming soon!\n";
-    // TODO: Implement staff schedule viewing
+    string branchName;
+    cout << "Enter branch name: ";
+    cin >> branchName;
+    
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found. Available branches: Auckland, Wellington, Christchurch\n";
+        return;
+    }
+    
+    cout << "\n=== Staff Schedules for " << branchName << " ===\n";
+    branches[branchName].displayStaff();
 }
 
 void addStaff() {
-    cout << "Add staff - coming soon!\n";
-    // TODO: Implement adding staff members
+    string branchName;
+    cout << "Enter branch name: ";
+    cin >> branchName;
+    
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found. Available branches: Auckland, Wellington, Christchurch\n";
+        return;
+    }
+    
+    string name, role, schedule;
+    cout << "Enter staff name: ";
+    cin.ignore();
+    getline(cin, name);
+    
+    if (name.empty()) {
+        cout << "Staff name cannot be empty.\n";
+        return;
+    }
+    
+    cout << "Enter staff role: ";
+    getline(cin, role);
+    cout << "Enter staff schedule: ";
+    getline(cin, schedule);
+    
+    Staff newStaff(name, role, schedule);
+    branches[branchName].addStaff(newStaff);
 }
 
 void updateStaff() {
-    cout << "Update staff - coming soon!\n";
-    // TODO: Implement updating staff information
+    string branchName;
+    cout << "Enter branch name: ";
+    cin >> branchName;
+    
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found.\n";
+        return;
+    }
+    
+    cout << "\nCurrent staff in " << branchName << ":\n";
+    branches[branchName].displayStaff();
+    
+    string staffName;
+    cout << "\nEnter staff name to update: ";
+    cin.ignore();
+    getline(cin, staffName);
+    
+    Staff* staff = branches[branchName].findStaff(staffName);
+    if (!staff) {
+        cout << "Staff member not found.\n";
+        return;
+    }
+    
+    cout << "Current details - Role: " << staff->role << ", Schedule: " << staff->schedule << endl;
+    
+    cout << "Enter new role (or press Enter to keep current): ";
+    string newRole;
+    getline(cin, newRole);
+    if (!newRole.empty()) {
+        staff->role = newRole;
+    }
+    
+    cout << "Enter new schedule (or press Enter to keep current): ";
+    string newSchedule;
+    getline(cin, newSchedule);
+    if (!newSchedule.empty()) {
+        staff->schedule = newSchedule;
+    }
+    
+    cout << "Staff member updated successfully!\n";
 }
 
 void deleteStaff() {
-    cout << "Delete staff - coming soon!\n";
-    // TODO: Implement deleting staff members
+    string branchName;
+    cout << "Enter branch name: ";
+    cin >> branchName;
+    
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found.\n";
+        return;
+    }
+    
+    cout << "\nCurrent staff in " << branchName << ":\n";
+    branches[branchName].displayStaff();
+    
+    string staffName;
+    cout << "\nEnter staff name to remove: ";
+    cin.ignore();
+    getline(cin, staffName);
+    
+    if (getConfirmation("Are you sure you want to remove this staff member?")) {
+        if (branches[branchName].removeStaff(staffName)) {
+            cout << "Staff member removed successfully!\n";
+        } else {
+            cout << "Staff member not found.\n";
+        }
+    } else {
+        cout << "Removal cancelled.\n";
+    }
 }
+
 // === STOCK MANAGEMENT SUBMENU ===
 void stockManagementMenu() {
     int choice;
@@ -379,24 +559,80 @@ void staffManagementMenu() {
         }
     } while (choice != 0);
 }
-// === USER FUNCTIONS (TO BE IMPLEMENTED BY TEAM) ===
+
+// === USER FUNCTIONS ===
 
 void listBranches() {
     cout << "Available branches:\n";
     for (auto& pair : branches) {
         cout << "- " << pair.first << '\n';
     }
-    // This one is already implemented since it's simple!
 }
 
 void browseBranchStock() {
-    cout << "Browse branch stock - coming soon!\n";
-    // TODO: Implement browsing products by branch
+    string branchName;
+    cout << "Enter branch name to browse: ";
+    cin >> branchName;
+    
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found. Available branches: Auckland, Wellington, Christchurch\n";
+        return;
+    }
+    
+    cout << "\n=== Products in " << branchName << " ===\n";
+    branches[branchName].displayStock(false);
 }
 
 void buyFromBranch() {
-    cout << "Buy from branch - coming soon!\n";
-    // TODO: Implement purchase system
+    string branchName, productName;
+    int quantity;
+    
+    cout << "Enter branch name: ";
+    cin >> branchName;
+    
+    if (branches.find(branchName) == branches.end()) {
+        cout << "Branch not found. Available branches: Auckland, Wellington, Christchurch\n";
+        return;
+    }
+    
+    cout << "\nAvailable products in " << branchName << ":\n";
+    branches[branchName].displayStock(false);
+    
+    cout << "\nEnter product name to buy: ";
+    cin.ignore();
+    getline(cin, productName);
+    
+    StockItem* item = branches[branchName].findStockItem(productName);
+    if (!item) {
+        cout << "Product not found.\n";
+        return;
+    }
+    
+    cout << "Available quantity: " << item->quantity << endl;
+    cout << "Enter quantity to buy: ";
+    cin >> quantity;
+    
+    if (quantity <= 0) {
+        cout << "Invalid quantity.\n";
+        return;
+    }
+    
+    if (quantity > item->quantity) {
+        cout << "Not enough stock available.\n";
+        return;
+    }
+    
+    double totalCost = quantity * item->price;
+    cout << fixed << setprecision(2);
+    cout << "Total cost: $" << totalCost << endl;
+    
+    if (getConfirmation("Confirm purchase?")) {
+        item->quantity -= quantity;
+        cout << "Purchase successful! Thank you for shopping with Aotearoa Treasures.\n";
+        cout << "Remaining stock: " << item->quantity << endl;
+    } else {
+        cout << "Purchase cancelled.\n";
+    }
 }
 
 // === MENU FUNCTIONS ===
@@ -473,13 +709,13 @@ void loginUser() {
         // Check for hardcoded admin first
         if (username == "admin" && password == "admin123") {
             cout << "Login successful!\n";
-            cout << "Welcome admin: " << username << endl;
+            cout << "Welcome Admin: " << username << endl;
             currentUserRole = "Admin";
             adminMenu();
             return;
         }
 
-        // Check registered users
+        // This will be checking for the registered users
         for (const auto& user : users) {
             if (user.username == username && user.password == password) {
                 cout << "Login successful!\n";
@@ -507,7 +743,6 @@ void loginUser() {
 }
 
 int main() {
-    // Initialize branch data
     initializeBranches();
 
     int choice;
