@@ -1,23 +1,9 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <unordered_map>
-#include <limits>
-#include <algorithm>
-#include <iomanip>
-#include <cmath>
+#include "header.h"
 using namespace std;
 
 string currentUsername = "";
 string currentUserRole = "";
-
-struct User {
-    string username;
-    string password;
-    string role; // "User" or "Admin"
-};
+unordered_map<string, Branch> branches;
 
 bool isVaildText(const string& input) {
     for (char c : input) {
@@ -82,27 +68,22 @@ void registerUser() {
     cout << "Registration successful!\n";
 }
 
-struct StockItem {
-    string name;
-    int quantity;
-    double price;
-
-    StockItem() : name(""), quantity(0), price(0.0) {}
-    StockItem(string n, int q, double p) : name(n), quantity(q), price(p) {}
+    StockItem StockItem() : name(""), quantity(0), price(0.0) {}
+    StockItem StockItem(string n, int q, double p) : name(n), quantity(q), price(p) {}
 
     // Lowstock check
-    bool isLowStock() {
+    bool StockItem isLowStock() {
         return quantity < 5;
     }
 
-    bool reduceQuantity(int amount) {
+    bool StockItem reduceQuantity(int amount) {
         if (amount <= 0 || amount > quantity)
             return false;
         quantity -= amount;
         return true;
     }
 
-    void display(bool showLowStock = false) {
+    void StockItem display(bool showLowStock = false) {
         cout << fixed << setprecision(2);
         cout << "Name: " << name << " | Quantity: " << quantity << " | Price: $" << price;
         if (showLowStock && isLowStock()) {
@@ -112,32 +93,23 @@ struct StockItem {
     }
 };
 
-struct Staff {
-    string name;
-    string role;
-    string schedule;
+   Staff Staff() : name(""), role(""), schedule("") {}
+   Staff Staff(string n, string r, string s) : name(n), role(r), schedule(s) {}
 
-    Staff() : name(""), role(""), schedule("") {}
-    Staff(string n, string r, string s) : name(n), role(r), schedule(s) {}
-
-    void display() {
+    void Staff display() {
         cout << "- " << name << " | Role: " << role << " | Schedule: " << schedule << endl;
     }
 };
 
-struct Branch {
-    vector<StockItem> stock;
-    vector<Staff> staff;
+Branch Branch(){
     
-    string toLowerCase(string str) {
+    string Branch toLowerCase(string str) {
         transform(str.begin(), str.end(), str.begin(), ::tolower);
         return str;
     }
 
-    Branch() {}
-
     // Add stock item
-    void addStockItem(StockItem item, bool silent = false) {
+    void Branch addStockItem(StockItem item, bool silent = false) {
         for (auto& s : stock) {
             if (toLowerCase(s.name) == toLowerCase(item.name)) {
                 s.quantity += item.quantity;
@@ -149,7 +121,7 @@ struct Branch {
         if (!silent) cout << "Stock item added: " << item.name << endl;
     }
 
-    StockItem* findStockItem(string name) {
+    StockItem* Branch findStockItem(string name) {
         for (auto& s : stock) {
             if (toLowerCase(s.name) == toLowerCase(name)) return &s;
         }
@@ -157,7 +129,7 @@ struct Branch {
     }
 
     // Remove stock item
-    bool removeStockItem(string name) {
+    bool Branch removeStockItem(string name) {
         auto it = remove_if(stock.begin(), stock.end(), [&](StockItem& s) {
             return toLowerCase(s.name) == toLowerCase(name);
         });
@@ -168,7 +140,7 @@ struct Branch {
         return false;
     }
 
-    void addStaff(Staff member, bool silent = false) {
+    void Branch addStaff(Staff member, bool silent = false) {
         // Check if staff already exists
         for (const auto& s : staff) {
             if (toLowerCase(s.name) == toLowerCase(member.name)) {
@@ -180,7 +152,7 @@ struct Branch {
         if (!silent) cout << "Staff member " << member.name << " added successfully.\n";
     }
 
-    Staff* findStaff(string name) {
+    Staff* Branch findStaff(string name) {
         for (auto& s : staff) {
             if (toLowerCase(s.name) == toLowerCase(name)) {
                 return &s;
@@ -189,7 +161,7 @@ struct Branch {
         return nullptr;
     }
 
-    bool removeStaff(string name) {
+    bool Branch removeStaff(string name) {
         auto it = remove_if(staff.begin(), staff.end(), [&](Staff& s) {
             return toLowerCase(s.name) == toLowerCase(name);
         });
@@ -200,7 +172,7 @@ struct Branch {
         return false;
     }
 
-    void displayStaff() {
+    void Branch displayStaff() {
         if (staff.empty()) {
             cout << "No staff members in this branch.\n";
             return;
@@ -211,7 +183,7 @@ struct Branch {
         }
     }
 
-    void displayStock(bool showLowStock = false) {
+    void Branch displayStock(bool showLowStock = false) {
         if (stock.empty()) {
             cout << "No stock items in this branch.\n";
             return;
